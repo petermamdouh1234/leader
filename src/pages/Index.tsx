@@ -24,7 +24,8 @@ const Index = () => {
           alt="Calma - Sheikh Zayed Property"
           className="w-full h-auto"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-transparent" />
+      
+
       </div>
 
       {/* Content */}
