@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import heroImage from "@/assets/hero-property.jpg";
+import heroImage from "@/assets/65.png";
 import ContactForm from "@/components/ContactForm";
 import FloatingButtons from "@/components/FloatingButtons";
 
