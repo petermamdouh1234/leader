@@ -14,17 +14,25 @@ interface ContactFormProps {
 const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
     job: "",
+    type: "", // دوبليكس / ستوديو
     rooms: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.mobile || !formData.job || !formData.rooms) {
+
+    if (
+      !formData.name ||
+      !formData.mobile ||
+      !formData.job ||
+      !formData.type ||
+      !formData.rooms
+    ) {
       toast({
         title: "خطأ",
         description: "يرجى ملء جميع الحقول",
@@ -35,13 +43,15 @@ const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
 
     setIsSubmitting(true);
 
-    // Create mailto link as fallback (for demo purposes)
     const subject = encodeURIComponent("طلب جديد من موقع Calma");
     const body = encodeURIComponent(
-      `الاسم: ${formData.name}\nرقم الموبايل: ${formData.mobile}\nالوظيفة: ${formData.job}\nعدد الغرف: ${formData.rooms}`
+      `الاسم: ${formData.name}
+رقم الموبايل: ${formData.mobile}
+الوظيفة: ${formData.job}
+النوع: ${formData.type}
+عدد الغرف: ${formData.rooms}`
     );
-    
-    // Open email client
+
     window.location.href = `mailto:mohamed.ismael@leadersdevelopments.com?subject=${subject}&body=${body}`;
 
     setTimeout(() => {
@@ -50,12 +60,19 @@ const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
         title: "تم بنجاح!",
         description: "سيتم التواصل معك قريباً",
       });
-      setFormData({ name: "", mobile: "", job: "", rooms: "" });
+      setFormData({
+        name: "",
+        mobile: "",
+        job: "",
+        type: "",
+        rooms: "",
+      });
       onClose();
     }, 1000);
   };
 
   const roomOptions = ["1", "2", "3"];
+  const typeOptions = ["دوبليكس", "ستوديو"];
 
   return (
     <AnimatePresence>
@@ -105,56 +122,80 @@ const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <User size={16} className="text-primary" />
                   الاسم
                 </Label>
                 <Input
-                  id="name"
-                  type="text"
-                  placeholder="أدخل اسمك الكامل"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-secondary border-border focus:border-primary transition-colors"
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  placeholder="أدخل اسمك الكامل"
                 />
               </div>
 
               {/* Mobile */}
               <div className="space-y-2">
-                <Label htmlFor="mobile" className="text-foreground flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Phone size={16} className="text-primary" />
                   رقم الموبايل
                 </Label>
                 <Input
-                  id="mobile"
                   type="tel"
-                  placeholder="أدخل رقم موبايلك"
-                  value={formData.mobile}
-                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                  className="bg-secondary border-border focus:border-primary transition-colors"
                   dir="ltr"
+                  value={formData.mobile}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mobile: e.target.value })
+                  }
+                  placeholder="أدخل رقم موبايلك"
                 />
               </div>
 
               {/* Job */}
               <div className="space-y-2">
-                <Label htmlFor="job" className="text-foreground flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Briefcase size={16} className="text-primary" />
                   الوظيفة
                 </Label>
                 <Input
-                  id="job"
-                  type="text"
-                  placeholder="أدخل وظيفتك"
                   value={formData.job}
-                  onChange={(e) => setFormData({ ...formData, job: e.target.value })}
-                  className="bg-secondary border-border focus:border-primary transition-colors"
+                  onChange={(e) =>
+                    setFormData({ ...formData, job: e.target.value })
+                  }
+                  placeholder="أدخل وظيفتك"
                 />
+              </div>
+
+              {/* Type */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Home size={16} className="text-primary" />
+                  النوع
+                </Label>
+                <div className="flex gap-3">
+                  {typeOptions.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, type: option })
+                      }
+                      className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
+                        formData.type === option
+                          ? "gold-gradient text-primary-foreground shadow-lg"
+                          : "bg-secondary border border-border"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Rooms */}
               <div className="space-y-2">
-                <Label className="text-foreground flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Home size={16} className="text-primary" />
                   عدد الغرف
                 </Label>
@@ -163,11 +204,13 @@ const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
                     <button
                       key={room}
                       type="button"
-                      onClick={() => setFormData({ ...formData, rooms: room })}
-                      className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                      onClick={() =>
+                        setFormData({ ...formData, rooms: room })
+                      }
+                      className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                         formData.rooms === room
                           ? "gold-gradient text-primary-foreground shadow-lg"
-                          : "bg-secondary text-foreground hover:bg-muted border border-border"
+                          : "bg-secondary border border-border"
                       }`}
                     >
                       {room}
@@ -180,7 +223,7 @@ const ContactForm = ({ isOpen, onClose }: ContactFormProps) => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full gold-gradient text-primary-foreground font-bold py-6 text-lg hover:opacity-90 transition-opacity animate-pulse-glow"
+                className="w-full gold-gradient py-6 text-lg font-bold"
               >
                 {isSubmitting ? (
                   <Loader2 className="animate-spin ml-2" size={20} />
